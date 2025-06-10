@@ -28,13 +28,6 @@ const teacherSchema = new mongoose.Schema({
     unique: true,
     length: 10
   },
-  startDate: {
-    type: Date,
-    required: true
-  },
-  endDate: {
-    type: Date
-  },
   teacherPositionsId: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'TeacherPosition'

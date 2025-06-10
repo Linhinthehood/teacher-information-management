@@ -12,63 +12,81 @@ const TeacherCreateModal = ({ open, onClose, onCreated }) => {
     identity: '',
     dob: '',
     degrees: [ { ...defaultDegree } ],
-    teacherPositions: [],
+    teacherPositionsId: [],
   });
   const [positions, setPositions] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (open) {
-      api.get('/teacher-positions').then(res => setPositions(res.data));
+      api.get('/teacher-positions').then(res => {
+        console.log('Fetched positions:', res.data);
+        setPositions(res.data);
+      });
     }
   }, [open]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    console.log('Form after handleChange:', { ...form, [e.target.name]: e.target.value });
   };
 
   const handleDegreeChange = (idx, e) => {
     const newDegrees = form.degrees.map((d, i) => i === idx ? { ...d, [e.target.name]: e.target.value } : d);
     setForm({ ...form, degrees: newDegrees });
+    console.log('Degrees after handleDegreeChange:', newDegrees);
   };
 
   const handleAddDegree = () => {
     setForm({ ...form, degrees: [...form.degrees, { ...defaultDegree }] });
+    console.log('Degrees after handleAddDegree:', [...form.degrees, { ...defaultDegree }]);
   };
 
   const handleRemoveDegree = (idx) => {
-    setForm({ ...form, degrees: form.degrees.filter((_, i) => i !== idx) });
+    const newDegrees = form.degrees.filter((_, i) => i !== idx);
+    setForm({ ...form, degrees: newDegrees });
+    console.log('Degrees after handleRemoveDegree:', newDegrees);
   };
 
   const handlePositionsChange = (e) => {
     const selected = Array.from(e.target.selectedOptions, option => option.value);
-    setForm({ ...form, teacherPositions: selected });
+    setForm({ ...form, teacherPositionsId: selected });
+    console.log('teacherPositionsId after handlePositionsChange:', selected);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    const payload = {
+      user: {
+        name: form.name,
+        email: form.email,
+        phoneNumber: form.phoneNumber,
+        address: form.address,
+        identity: form.identity,
+        dob: form.dob,
+      },
+      degrees: form.degrees.map(d => ({
+        ...d,
+        year: Number(d.year),
+        isGraduated: d.isGraduated === 'true' || d.isGraduated === true
+      })),
+      teacherPositionsId: form.teacherPositionsId,
+    };
+    console.log('Payload gửi lên backend:', payload);
     try {
-      await api.post('/teachers', {
-        user: {
-          name: form.name,
-          email: form.email,
-          phoneNumber: form.phoneNumber,
-          address: form.address,
-          identity: form.identity,
-          dob: form.dob,
-        },
-        degrees: form.degrees.map(d => ({
-          ...d,
-          year: Number(d.year),
-          isGraduated: d.isGraduated === 'true' || d.isGraduated === true
-        })),
-        teacherPositions: form.teacherPositions,
-      });
+      const res = await api.post('/teachers', payload);
+      console.log('Phản hồi từ backend:', res.data);
       onCreated();
       onClose();
     } catch (err) {
-      alert('Tạo giáo viên thất bại!');
+      if (err.response && err.response.data && err.response.data.message) {
+        console.error('Lỗi từ backend:', err.response.data.message);
+        alert('Tạo giáo viên thất bại: ' + err.response.data.message);
+      } else {
+        console.error('Lỗi không xác định:', err);
+        alert('Tạo giáo viên thất bại!');
+      }
     }
     setLoading(false);
   };
@@ -121,7 +139,7 @@ const TeacherCreateModal = ({ open, onClose, onCreated }) => {
               </div>
             </div>
             <div style={{ borderTop: '1px solid #eee', margin: '16px 0 8px 0', paddingTop: 8, fontWeight: 600 }}>Vị trí công tác *</div>
-            <select name="teacherPositions" multiple value={form.teacherPositions} onChange={handlePositionsChange} style={{ width: '100%', marginBottom: 8, minHeight: 40 }}>
+            <select name="teacherPositionsId" multiple value={form.teacherPositionsId} onChange={handlePositionsChange} style={{ width: '100%', marginBottom: 8, minHeight: 40 }}>
               {positions.map(pos => (
                 <option key={pos._id} value={pos._id}>{pos.code} - {pos.name}</option>
               ))}

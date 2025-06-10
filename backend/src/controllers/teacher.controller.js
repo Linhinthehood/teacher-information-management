@@ -65,7 +65,7 @@ exports.getTeachers = async (req, res) => {
 // POST /teachers - Tạo mới giáo viên
 exports.createTeacher = async (req, res) => {
   try {
-    const { user, teacherPositions, degrees, startDate, endDate, isActive } = req.body;
+    const { user, teacherPositionsId, degrees, startDate, endDate, isActive } = req.body;
     // Kiểm tra email duy nhất
     const emailExists = await User.findOne({ email: user.email });
     if (emailExists) return res.status(400).json({ message: 'Email already exists' });
@@ -80,7 +80,7 @@ exports.createTeacher = async (req, res) => {
     // Tạo teacher
     const newTeacher = new Teacher({
       userId: newUser._id,
-      teacherPositions,
+      teacherPositionsId,
       degrees,
       startDate,
       endDate,
