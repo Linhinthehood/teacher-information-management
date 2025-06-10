@@ -13,9 +13,6 @@ const TeacherCreateModal = ({ open, onClose, onCreated }) => {
     dob: '',
     degrees: [ { ...defaultDegree } ],
     teacherPositions: [],
-    startDate: '',
-    endDate: '',
-    isActive: true,
   });
   const [positions, setPositions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -67,9 +64,6 @@ const TeacherCreateModal = ({ open, onClose, onCreated }) => {
           isGraduated: d.isGraduated === 'true' || d.isGraduated === true
         })),
         teacherPositions: form.teacherPositions,
-        startDate: form.startDate,
-        endDate: form.endDate,
-        isActive: form.isActive === 'true' || form.isActive === true
       });
       onCreated();
       onClose();
@@ -126,27 +120,11 @@ const TeacherCreateModal = ({ open, onClose, onCreated }) => {
                 <input name="address" value={form.address} onChange={handleChange} required style={{ width: '100%', marginBottom: 8 }} />
               </div>
             </div>
-            <div style={{ borderTop: '1px solid #eee', margin: '16px 0 8px 0', paddingTop: 8, fontWeight: 600 }}>Thông tin công tác</div>
-            <label>Vị trí công tác *</label>
+            <div style={{ borderTop: '1px solid #eee', margin: '16px 0 8px 0', paddingTop: 8, fontWeight: 600 }}>Vị trí công tác *</div>
             <select name="teacherPositions" multiple value={form.teacherPositions} onChange={handlePositionsChange} style={{ width: '100%', marginBottom: 8, minHeight: 40 }}>
               {positions.map(pos => (
                 <option key={pos._id} value={pos._id}>{pos.code} - {pos.name}</option>
               ))}
-            </select>
-            <div style={{ display: 'flex', gap: 16, marginBottom: 8 }}>
-              <div style={{ flex: 1 }}>
-                <label>Ngày bắt đầu *</label>
-                <input name="startDate" type="date" value={form.startDate} onChange={handleChange} required style={{ width: '100%', marginBottom: 8 }} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <label>Ngày kết thúc</label>
-                <input name="endDate" type="date" value={form.endDate} onChange={handleChange} style={{ width: '100%', marginBottom: 8 }} />
-              </div>
-            </div>
-            <label>Trạng thái</label>
-            <select name="isActive" value={form.isActive} onChange={handleChange} style={{ width: '100%', marginBottom: 8 }}>
-              <option value={true}>Đang công tác</option>
-              <option value={false}>Nghỉ việc</option>
             </select>
           </div>
         </div>
